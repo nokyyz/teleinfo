@@ -10,6 +10,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.openhab.binding.teleinfo.network.tcp.ConstantsCodec.FrameType;
 import org.openhab.binding.teleinfo.reader.Frame;
 import org.openhab.binding.teleinfo.reader.Frame.PeriodeTarifaire;
+import org.openhab.binding.teleinfo.reader.FrameOptionBase;
 import org.openhab.binding.teleinfo.reader.FrameOptionHeuresCreuses;
 import org.openhab.binding.teleinfo.reader.FrameOptionHeuresCreuses.GroupeHoraire;
 import org.slf4j.Logger;
@@ -43,9 +44,11 @@ public class TeleinfoFrameProtocolDecoder extends CumulativeProtocolDecoder {
                 case FrameOptionHeuresCreuses:
                     decodedFrame = decodeFrameOptionHeuresCreuses(in);
                     break;
-                default:
-                    // FIXME
+                case FrameOptionBase:
+                    decodedFrame = decodeFrameOptionBase(in);
                     break;
+                default:
+                    throw new IllegalStateException("not yet implemented"); // FIXME
             }
 
             LOGGER.trace("decodedFrame = " + decodedFrame);
@@ -68,6 +71,14 @@ public class TeleinfoFrameProtocolDecoder extends CumulativeProtocolDecoder {
         frame.setGroupeHoraire(in.getEnum(GroupeHoraire.class));
         frame.setIndexHeuresCreuses(in.getInt());
         frame.setIndexHeuresPleines(in.getInt());
+
+        return frame;
+    }
+
+    private FrameOptionBase decodeFrameOptionBase(IoBuffer in) throws Exception {
+        FrameOptionBase frame = new FrameOptionBase();
+        decodeCommonsFields(in, frame);
+        frame.setIndexBase(in.getInt());
 
         return frame;
     }

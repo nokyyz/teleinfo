@@ -31,8 +31,7 @@ public class TeleinfoFrameProtocolEncoder implements ProtocolEncoder {
         if (message instanceof FrameOptionHeuresCreuses) {
             encode(bodyBuffer, (FrameOptionHeuresCreuses) message);
         } else if (message instanceof FrameOptionBase) {
-            // FIXME
-            throw new IllegalStateException("Teleinfo frame not supported");
+            encode(bodyBuffer, (FrameOptionBase) message);
         } else if (message instanceof FrameOptionEjp) {
             // FIXME
             throw new IllegalStateException("Teleinfo frame not supported");
@@ -62,6 +61,11 @@ public class TeleinfoFrameProtocolEncoder implements ProtocolEncoder {
 
     }
 
+    @Override
+    public void dispose(IoSession session) throws Exception {
+        // NOP
+    }
+
     private void encode(IoBuffer buffer, FrameOptionHeuresCreuses frame) throws Exception {
         buffer.putEnum(FrameType.FrameOptionHeuresCreuses);
         encodeCommonsFields(buffer, frame);
@@ -70,9 +74,10 @@ public class TeleinfoFrameProtocolEncoder implements ProtocolEncoder {
         buffer.putInt(frame.getIndexHeuresPleines());
     }
 
-    @Override
-    public void dispose(IoSession session) throws Exception {
-        // NOP
+    private void encode(IoBuffer buffer, FrameOptionBase frame) throws Exception {
+        buffer.putEnum(FrameType.FrameOptionBase);
+        encodeCommonsFields(buffer, frame);
+        buffer.putInt(frame.getIndexBase());
     }
 
     private void encodeCommonsFields(IoBuffer buffer, Frame frame) throws Exception {
