@@ -42,6 +42,7 @@ public class TeleinfoReaderClient extends TeleinfoReaderAdaptor {
         }
 
         LOGGER.info("Client starting...");
+        fireOnOpeningEvent();
         long startTime = new Date().getTime();
 
         connector = new NioSocketConnector();
@@ -50,10 +51,15 @@ public class TeleinfoReaderClient extends TeleinfoReaderAdaptor {
                 new ProtocolCodecFilter(new TeleinfoFrameProtocolEncoder(), new TeleinfoFrameProtocolDecoder()));
 
         connector.setHandler(new IoHandlerAdapter() {
-
             @Override
             public void messageReceived(IoSession session, Object message) throws Exception {
                 fireOnFrameReceivedEvent((Frame) message);
+            }
+
+            @Override
+            public void sessionClosed(IoSession session) throws Exception {
+                LOGGER.debug("sessionClosed...");
+                close();
             }
         });
         ConnectFuture connection = connector.connect(new InetSocketAddress(serverAddress, serverPort));
@@ -63,6 +69,7 @@ public class TeleinfoReaderClient extends TeleinfoReaderAdaptor {
         long endTime = new Date().getTime();
         LOGGER.info("Client connected to {}:{}' server (in {} ms)", serverAddress.toString(), serverPort,
                 endTime - startTime);
+        fireOnOpenedEvent();
 
         LOGGER.debug("open() [end]");
     }
@@ -70,12 +77,14 @@ public class TeleinfoReaderClient extends TeleinfoReaderAdaptor {
     @Override
     public void close() throws IOException {
         LOGGER.debug("close() [start]");
+        fireOnClosingEvent();
 
         session.close(true);
         session = null;
         connector.dispose(true);
         connector = null;
 
+        fireOnClosedEvent();
         LOGGER.debug("close() [end]");
     }
 }
