@@ -19,8 +19,7 @@ public class TeleinfoInputStreamTest2 {
     @Test(expected = TimeoutException.class, timeout = MAXIMUM_TIMEOUT_JUNIT)
     public void testTimeout1ReadNextFrame()
             throws InvalidFrameException, TimeoutException, IOException, InterruptedException, ExecutionException {
-        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new InvalidHeaderFrameTeleinfoInputStream(),
-                false);) {
+        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new InvalidHeaderFrameTeleinfoInputStream());) {
 
             teleinfoIn.readNextFrame();
             Assert.fail();
@@ -35,7 +34,7 @@ public class TeleinfoInputStreamTest2 {
     public void testTimeout2ReadNextFrame()
             throws InvalidFrameException, TimeoutException, IOException, InterruptedException, ExecutionException {
         try {
-            TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new OutOfTimeTeleinfoInputStream(), false);
+            TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new OutOfTimeTeleinfoInputStream());
 
             teleinfoIn.readNextFrame();
             Assert.fail("Timeout expected");

@@ -46,7 +46,6 @@ public class TeleinfoInputStream extends InputStream {
     private InputStream teleinfoInputStream = null;
     private String groupLine = null;
     private ExecutorService executorService = Executors.newFixedThreadPool(2);
-    private boolean skipDataBeforeReadNextFrameCall;
     private long waitNextHeaderFrameTimeoutInMs;
     private long readingFrameTimeoutInMs;
 
@@ -59,18 +58,16 @@ public class TeleinfoInputStream extends InputStream {
         LABEL_VALUE_CONVERTERS.put(GroupeHoraire.class, new GroupeHoraireConverter());
     }
 
-    public TeleinfoInputStream(final InputStream teleinfoInputStream, boolean skipDataBeforeReadNextFrameCall) {
-        this(teleinfoInputStream, skipDataBeforeReadNextFrameCall, DEFAULT_TIMEOUT_WAIT_NEXT_HEADER_FRAME,
-                DEFAULT_TIMEOUT_READING_FRAME);
+    public TeleinfoInputStream(final InputStream teleinfoInputStream) {
+        this(teleinfoInputStream, DEFAULT_TIMEOUT_WAIT_NEXT_HEADER_FRAME, DEFAULT_TIMEOUT_READING_FRAME);
     }
 
-    public TeleinfoInputStream(final InputStream teleinfoInputStream, boolean skipDataBeforeReadNextFrameCall,
-            long waitNextHeaderFrameTimeoutInMs, long readingFrameTimeoutInMs) {
+    public TeleinfoInputStream(final InputStream teleinfoInputStream, long waitNextHeaderFrameTimeoutInMs,
+            long readingFrameTimeoutInMs) {
         if (teleinfoInputStream == null) {
             throw new IllegalArgumentException("Teleinfo inputStream not null");
         }
 
-        this.skipDataBeforeReadNextFrameCall = skipDataBeforeReadNextFrameCall;
         this.waitNextHeaderFrameTimeoutInMs = waitNextHeaderFrameTimeoutInMs;
         this.readingFrameTimeoutInMs = readingFrameTimeoutInMs;
 
@@ -104,14 +101,6 @@ public class TeleinfoInputStream extends InputStream {
      */
     public synchronized Frame readNextFrame() throws InvalidFrameException, TimeoutException, IOException {
         LOGGER.debug("readNextFrame() [start]");
-
-        if (skipDataBeforeReadNextFrameCall) {
-            long bytesToSkipCount = teleinfoInputStream.available() - 1;
-            LOGGER.trace("bytesToSkipCount = {}", bytesToSkipCount);
-            if (bytesToSkipCount > 0) {
-                bufferedReader.skip(bytesToSkipCount);
-            }
-        }
 
         // seek the next header frame
         Future<Void> seekNextHeaderFrameTask = executorService.submit(new Callable<Void>() {

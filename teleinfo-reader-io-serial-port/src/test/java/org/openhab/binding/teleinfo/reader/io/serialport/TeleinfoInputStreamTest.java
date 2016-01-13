@@ -27,7 +27,7 @@ public class TeleinfoInputStreamTest {
     @Test
     public void test1ReadNextFrame() throws InvalidFrameException, TimeoutException, IOException {
         File teleinfoStream2 = TestUtils.getTestFile("teleinfo-stream/teleinfo-2.raw");
-        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new FileInputStream(teleinfoStream2), false,
+        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new FileInputStream(teleinfoStream2),
                 waitNextHeaderFrameTimeoutInMs, readingFrameTimeoutInMs);) {
 
             Frame frame1 = teleinfoIn.readNextFrame();
@@ -61,7 +61,7 @@ public class TeleinfoInputStreamTest {
     @Test
     public void test2ReadNextFrame() throws InvalidFrameException, TimeoutException, IOException {
         File teleinfoStream3 = TestUtils.getTestFile("teleinfo-stream/teleinfo-3.raw");
-        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new FileInputStream(teleinfoStream3), false,
+        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new FileInputStream(teleinfoStream3),
                 waitNextHeaderFrameTimeoutInMs, readingFrameTimeoutInMs);) {
 
             Frame frame1 = teleinfoIn.readNextFrame();
@@ -95,7 +95,7 @@ public class TeleinfoInputStreamTest {
     @Test
     public void test3ReadNextFrame() throws InvalidFrameException, TimeoutException, IOException {
         File teleinfoStream1 = TestUtils.getTestFile("teleinfo-stream/teleinfo-1.raw");
-        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new FileInputStream(teleinfoStream1), false,
+        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new FileInputStream(teleinfoStream1),
                 waitNextHeaderFrameTimeoutInMs, readingFrameTimeoutInMs);) {
             Frame frame1 = teleinfoIn.readNextFrame();
             TestUtils.assertFrameOptionHeuresCreusesEquals(adco, null, PeriodeTarifaire.HP, GroupeHoraire.A, 6906827,
@@ -134,7 +134,7 @@ public class TeleinfoInputStreamTest {
     @Test(expected = InvalidFrameException.class)
     public void test4ReadNextFrame() throws InvalidFrameException, TimeoutException, IOException {
         File teleinfoStream1 = TestUtils.getTestFile("teleinfo-stream/teleinfo-1.raw");
-        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new FileInputStream(teleinfoStream1), false,
+        try (TeleinfoInputStream teleinfoIn = new TeleinfoInputStream(new FileInputStream(teleinfoStream1),
                 waitNextHeaderFrameTimeoutInMs, readingFrameTimeoutInMs);) {
             // skip 13 first frames
             for (int i = 0; i < 13; i++) {
