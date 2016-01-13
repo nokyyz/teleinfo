@@ -52,6 +52,7 @@ public class TeleinfoServer {
         acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 
         acceptor.bind(new InetSocketAddress(serverAddress, serverPort));
+        acceptor.setCloseOnDeactivation(true);
 
         long endTime = new Date().getTime();
         LOGGER.info("Server started (in {} ms)", endTime - startTime);
