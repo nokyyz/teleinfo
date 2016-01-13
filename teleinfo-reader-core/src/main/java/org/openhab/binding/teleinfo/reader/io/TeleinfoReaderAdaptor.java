@@ -26,6 +26,30 @@ public abstract class TeleinfoReaderAdaptor implements TeleinfoReader {
         }
     }
 
+    protected void fireOnOpeningEvent() {
+        for (TeleinfoReaderListener listener : listeners) {
+            listener.onOpening(this);
+        }
+    }
+
+    protected void fireOnOpenedEvent() {
+        for (TeleinfoReaderListener listener : listeners) {
+            listener.onOpened(this);
+        }
+    }
+
+    protected void fireOnClosingEvent() {
+        for (TeleinfoReaderListener listener : listeners) {
+            listener.onClosing(this);
+        }
+    }
+
+    protected void fireOnClosedEvent() {
+        for (TeleinfoReaderListener listener : listeners) {
+            listener.onClosed(this);
+        }
+    }
+
     public List<TeleinfoReaderListener> getListeners() {
         return Collections.unmodifiableList(listeners);
     }

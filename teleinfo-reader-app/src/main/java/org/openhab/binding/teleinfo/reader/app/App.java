@@ -7,7 +7,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.openhab.binding.teleinfo.network.tcp.TeleinfoServer;
 import org.openhab.binding.teleinfo.reader.Frame;
 import org.openhab.binding.teleinfo.reader.io.TeleinfoReader;
-import org.openhab.binding.teleinfo.reader.io.TeleinfoReaderListener;
+import org.openhab.binding.teleinfo.reader.io.TeleinfoReaderListenerAdaptor;
 import org.openhab.binding.teleinfo.reader.io.serialport.TeleinfoSerialportReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class App {
                                                                                                            // paramétrable
         serialPortReader.setReadingFrameTimeoutInMs(DEFAULT_TIMEOUT_READING_FRAME * 1000); // FIXME rendre paramétrable
 
-        serialPortReader.addListener(new TeleinfoReaderListener() {
+        serialPortReader.addListener(new TeleinfoReaderListenerAdaptor() {
             @Override
             public void onFrameReceived(TeleinfoReader reader, Frame frame) {
                 teleinfoServer.broadcast(frame);
