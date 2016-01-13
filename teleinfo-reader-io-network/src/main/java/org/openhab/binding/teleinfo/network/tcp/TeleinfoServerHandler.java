@@ -32,7 +32,7 @@ public class TeleinfoServerHandler implements IoHandler {
 
     @Override
     public void sessionClosed(IoSession session) throws Exception {
-
+        logTotalOpenedSession(session);
     }
 
     @Override
@@ -47,7 +47,10 @@ public class TeleinfoServerHandler implements IoHandler {
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
-        // NOP
-        LOGGER.info("Total opened sessions on server: {}", session.getService().getManagedSessionCount());
+        logTotalOpenedSession(session);
+    }
+
+    private void logTotalOpenedSession(IoSession session) {
+        LOGGER.info("Total opened session on server: {}", session.getService().getManagedSessionCount());
     }
 }
