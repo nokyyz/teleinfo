@@ -89,7 +89,7 @@ public class TeleinfoServer {
         }
 
         if (acceptor.getManagedSessionCount() == 0) {
-            LOGGER.warn("Teleinfo frame not sent because no client connected");
+            LOGGER.info("Teleinfo frame not sent because no client connected");
             return;
         }
 
