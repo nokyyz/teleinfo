@@ -88,6 +88,7 @@ public class App {
             exit(ReturnCode.ERROR_RETURN_CODE);
         } catch (final Throwable e) {
             LOGGER.error("An fatal error occurred during runtime", e);
+            e.printStackTrace();
             exit(ReturnCode.ERROR_RETURN_CODE);
         }
     }
