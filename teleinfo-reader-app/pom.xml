@@ -9,6 +9,13 @@
     <artifactId>teleinfo-reader-app</artifactId>
 
 	<build>
+	    <resources>
+	       <resource>
+	          <directory>src/main/resources</directory>
+	          <filtering>true</filtering>
+		   </resource>
+	    </resources>
+	    
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
