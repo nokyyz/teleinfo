@@ -10,7 +10,7 @@
 ## Fonctionnalités
 
 ### Lecture des données Teleinfo
-Teleinfo Reader permet de lire et décoder les données Téléinfo depuis le port série de votre système d'exploitation (ex : port COM sous Windows, /dev/ttyAxxx depuis Linux).
+Teleinfo Reader permet de lire et décoder les données Teleinfo depuis le port série de votre système d'exploitation (ex : port COM sous Windows, /dev/ttyAxxx depuis Linux).
 
 Les données Teleinfo prises en compte sont :
 * les trames de base
@@ -19,12 +19,15 @@ Les données Teleinfo prises en compte sont :
 * les trames EJP
 
 ### Historisation des données Teleinfo
+Teleinfo Reader stocke l'ensemble des trames Teleinfo lues. Ces données sont disponibles pour la Diffusion à  la demande.
+
+Teleinfo Reader supporte plusieurs mécanismes de persistence. En effet, la persistence des données est gérée sous forme d'addon, ce qui permet d'ajouter de nombreuses implémentations.   
 
 ### Diffusion des données Teleinfo
 
 #### Diffusion "temps réel"
 
-#### Duffision à la demande
+#### Diffusion à la demande
 
 ## Pré-requis
 
