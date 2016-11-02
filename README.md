@@ -5,7 +5,7 @@
 * d'**historiser** l'ensemble des données Teleinfo lues
 * de **diffuser** en temps réel et/ou à la demande ces données Teleinfo sur votre réseau.
 
-<img src="./doc/resources/general_architecture.png" alt="Générale architecture" style="width: 400px;"/>
+<img src="./doc/resources/generale_architecture.png" alt="Générale architecture" style="width: 400px;"/>
 
 ## Fonctionnalités
 
