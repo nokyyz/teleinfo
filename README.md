@@ -1,9 +1,9 @@
 # Teleinfo Reader
 
 **Teleinfo Reader** est une application qui permet :
-* de **lire** les données Teleinfo depuis votre compteur ERDF/EDF
+* de **lire** les données Teleinfo de votre compteur ERDF/EDF depuis votre port série
 * d'**historiser** l'ensemble des données Teleinfo lues
-* de **diffuser** en temps réel et/ou à la demande ces données Teleinfo sur votre réseau.
+* de **diffuser** en temps réel et/ou à la demande ces données Teleinfo.
 
 <img src="./doc/resources/generale_architecture.png" alt="Générale architecture" style="width: 400px;"/>
 
