@@ -1,0 +1,1 @@
+Write in this folder your configuration plugins (<PLUGIN-ID>.cfg) !

@@ -7,9 +7,9 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openhab.binding.teleinfo.reader.Frame;
-import org.openhab.binding.teleinfo.reader.Frame.PeriodeTarifaire;
-import org.openhab.binding.teleinfo.reader.FrameOptionHeuresCreuses.GroupeHoraire;
+import org.openhab.binding.teleinfo.reader.dsl.Frame;
+import org.openhab.binding.teleinfo.reader.dsl.Frame.PeriodeTarifaire;
+import org.openhab.binding.teleinfo.reader.dsl.FrameOptionHeuresCreuses.GroupeHoraire;
 import org.openhab.binding.teleinfo.reader.utils.TestUtils;
 
 public class TeleinfoInputStreamTest {

@@ -1,6 +1,6 @@
 package org.openhab.binding.teleinfo.reader.io.serialport.converter;
 
-import org.openhab.binding.teleinfo.reader.Frame.PeriodeTarifaire;
+import org.openhab.binding.teleinfo.reader.dsl.Frame.PeriodeTarifaire;
 import org.openhab.binding.teleinfo.reader.io.serialport.ConvertionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

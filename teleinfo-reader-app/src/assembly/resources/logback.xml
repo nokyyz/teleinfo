@@ -7,10 +7,10 @@
 	</appender>
 
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${app.logdir:-logs}/teleinfo.log</file>
+		<file>${app.logdir:-logs}/teleinfo-reader.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- weekly rollover and archiving -->
-			<fileNamePattern>${app.logdir:-logs}/teleinfo-%d{yyyy-ww}.log.zip</fileNamePattern>
+			<fileNamePattern>${app.logdir:-logs}/teleinfo-reader-%d{yyyy-ww}.log.zip</fileNamePattern>
 			<!-- maximum number of archive files to keep -->
 			<maxHistory>26</maxHistory>
 		</rollingPolicy>
@@ -23,7 +23,7 @@
 
 	<root level="ERROR">
 		<appender-ref ref="FILE" />
-<!-- 		<appender-ref ref="STDOUT" /> -->
+		<appender-ref ref="STDOUT" />
 	</root>
 
 </configuration>

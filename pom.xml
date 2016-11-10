@@ -7,10 +7,15 @@
 	<packaging>pom</packaging>
     
     <modules>
+   		<module>teleinfo-reader-dsl</module>
         <module>teleinfo-reader-core</module>
 		<module>teleinfo-reader-io-serial-port</module>
-        <module>teleinfo-reader-io-network</module>
         <module>teleinfo-reader-app</module>
+        <module>teleinfo-reader-core-plugin</module>
+        <module>teleinfo-reader-persistence-plugin</module>
+        <module>teleinfo-reader-broadcast-plugin</module>
+        <module>./plugins/persistence/jpa-persistence-plugin</module>
+        <module>./plugins/broadcast/teleinfo-reader-broadcast-tcpip</module>
     </modules>
 	
 	<properties>

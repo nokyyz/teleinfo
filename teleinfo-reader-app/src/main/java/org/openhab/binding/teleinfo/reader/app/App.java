@@ -1,7 +1,5 @@
 package org.openhab.binding.teleinfo.reader.app;
 
-import static org.openhab.binding.teleinfo.reader.io.serialport.TeleinfoInputStream.*;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,67 +15,134 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.LogManager;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.openhab.binding.teleinfo.network.tcp.TeleinfoServer;
-import org.openhab.binding.teleinfo.reader.Frame;
-import org.openhab.binding.teleinfo.reader.io.TeleinfoReader;
-import org.openhab.binding.teleinfo.reader.io.TeleinfoReaderListenerAdaptor;
-import org.openhab.binding.teleinfo.reader.io.serialport.TeleinfoSerialportReader;
+import org.openhab.binding.teleinfo.reader.context.ApplicationContext;
+import org.openhab.binding.teleinfo.reader.context.ApplicationContextListenerAdapter;
+import org.openhab.binding.teleinfo.reader.context.ApplicationContextProvider;
+import org.openhab.binding.teleinfo.reader.plugin.broadcast.BroadcastService;
+import org.openhab.binding.teleinfo.reader.plugin.core.conf.InvalidConfigurationException;
+import org.openhab.binding.teleinfo.reader.plugin.persistence.PersistenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class App {
+public class App extends ApplicationContextListenerAdapter {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(App.class);
-    private static final String DAEMON_NAME = "teleinfo-deamon";
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private static final String DAEMON_NAME = "teleinfo-reader-deamon";
 
     private Options options;
+    private ApplicationContext appContext;
 
-    private TeleinfoServer teleinfoServer = null;
-    private TeleinfoSerialportReader serialPortReader;
 
     public App(final Options options) {
-        System.out.println("Teleinfo Serial Port version " + AppResources.APP_VERSION.getLocalized());
-
         this.options = options;
     }
 
     public void start() throws Exception {
-        System.out.println("Starting...");
-        teleinfoServer = new TeleinfoServer(9999);
+        System.out.println("Teleinfo Reader - " + AppResources.APP_VERSION.getLocalized() + "  (https://github.com/nokyyz/teleinfo-reader)");
+        System.out.println();
+        
+        ApplicationContextProvider appContextProvider = ApplicationContextProvider.getProvider();
+        if (appContextProvider == null) {
+        	printFatalErrorMessage("No applicationContext provider found");
+        	return;
+        }
+        this.appContext = appContextProvider.createApplicationContext();
+        appContext.addListener(this);
 
-        serialPortReader = new TeleinfoSerialportReader(options.getSerialPort(), options.getRefreshInterval());
-        serialPortReader.setWaitNextHeaderFrameTimeoutInMs(DEFAULT_TIMEOUT_WAIT_NEXT_HEADER_FRAME * 1000); // FIXME
-                                                                                                           // rendre
-                                                                                                           // paramétrable
-        serialPortReader.setReadingFrameTimeoutInMs(DEFAULT_TIMEOUT_READING_FRAME * 1000); // FIXME rendre paramétrable
+        appContext.setSerialPortName(options.getSerialPort());
+        appContext.setRefreshInterval(options.getRefreshInterval());
+        appContext.setPluginsFolder(new File("./plugins"));
+        appContext.setPluginsConfigurationHandler(new PropertiesConfigurationPluginHandler(new File("./conf/plugins/")) {
+			@Override
+			public void onInvalidConfiguration(InvalidConfigurationException error, String pluginId) {
+				final String errorMessage = "The configuration of '" + pluginId + "' plugin is invalid";
+				LOGGER.error(errorMessage, error);
+				printErrorMessage(errorMessage + " (see log for more details)");
+			}
+		});
 
-        serialPortReader.addListener(new TeleinfoReaderListenerAdaptor() {
-            @Override
-            public void onFrameReceived(TeleinfoReader reader, Frame frame) {
-                teleinfoServer.broadcast(frame);
-            }
-        });
+    	LogManager.getLogManager().reset(); // trick to disable log message from JPF
 
-        teleinfoServer.start();
-        serialPortReader.open();
+        appContext.init();
     }
 
-    public void stop() throws Exception {
-        System.out.println("Stopping...");
-        if (serialPortReader != null) {
-            serialPortReader.close();
-            serialPortReader = null;
-        }
-        if (teleinfoServer != null && teleinfoServer.isOnline()) {
-            teleinfoServer.stop();
-            teleinfoServer = null;
-        }
-        System.out.println("Bye");
+    @Override
+	public void onInitializing(ApplicationContext appContext) {
+    	printInfoMessage("Initialization...");
+	}
+
+	@Override
+	public void onInitialized(ApplicationContext appContext) {
+		printInfoMessage("Started !");
+	}
+
+	@Override
+	public void onBroadcastPluginsLoading(ApplicationContext appContext) {
+		printInfoMessage("Broadcast plugins loading...");
+	}
+
+	@Override
+	public void onBroadcastPluginLoading(ApplicationContext appContext, String pluginFilename) {
+		printInfoMessage("'" + pluginFilename + "' broadcast plugin loading...");
+	}
+
+	@Override
+	public void onBroadcastPluginLoaded(ApplicationContext appContext, final String serviceId, BroadcastService broadcastServiceLoaded) {
+		printInfoMessage("'" + serviceId + "' broadcast plugin loaded");
+	}
+
+	@Override
+	public void onPersistencePluginsLoading(ApplicationContext appContext) {
+		printInfoMessage("Persistence plugins loading...");
+	}
+
+	@Override
+	public void onPersistencePluginLoading(ApplicationContext appContext, String pluginFilename) {
+		printInfoMessage("'" + pluginFilename + "' persistence plugin loading...");
+	}
+
+	@Override
+	public void onPersistencePluginLoaded(ApplicationContext appContext, String serviceId,
+			PersistenceService persistenceServiceLoaded) {
+		printInfoMessage("'" + serviceId + "' persistence plugin loaded");
+	}
+	
+	@Override
+	public void onSerialPortOpening(ApplicationContext appContext, String serialPortName) {
+		printInfoMessage("Serial port " + serialPortName + " opening...");
+	}
+
+	@Override
+	public void onSerialPortStarted(ApplicationContext appContext, String serialPortName) {
+		printInfoMessage("Serial port started");
+	}
+
+	@Override
+	public void onBroadcastPluginStopping(ApplicationContext appContext, String serviceId) {
+		printInfoMessage("'" + serviceId + "' broadcast plugin stopping...");
+	}
+
+	@Override
+	public void onBroadcastPluginStopped(ApplicationContext appContext, String serviceId) {
+		printInfoMessage("'" + serviceId + "' broadcast plugin stopped");
+	}
+
+	public void stop() throws Exception {
+		printInfoMessage("Stopping...");
+    	if (appContext != null) {
+        	appContext.destroy();
+    	}
     }
 
+	
+    /**
+     * MAIN function
+     * @param args
+     */
     public static void main(String[] args) {
         CmdLineParser parser = null;
         try {
@@ -88,15 +153,14 @@ public class App {
             final App app = new App(options);
 
             if (options.isInstallAsService()) {
-                System.out.println("Installing Teleinfo Reader service...");
+            	printInfoMessage("Installing Teleinfo Reader service...");
                 installAsService(options, args);
-                System.out.println("Teleinfo Reader service installed !");
-                System.out.println("To start automatically this service, execute the following commands:");
-                System.out.println("sudo chmod a+x /etc/init.d/" + DAEMON_NAME);
-                System.out.println("sudo update-rc.d " + DAEMON_NAME + " defaults");
+                printInfoMessage("Teleinfo Reader service installed !");
+                printInfoMessage("To start automatically this service, execute the following commands:");
+                printInfoMessage("sudo chmod a+x /etc/init.d/" + DAEMON_NAME);
+                printInfoMessage("sudo update-rc.d " + DAEMON_NAME + " defaults");
                 System.out.println();
 
-                System.out.println("Bye");
                 exit(ReturnCode.SUCCESS_RETURN_CODE);
             } else {
                 Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -104,14 +168,15 @@ public class App {
                     public void run() {
                         try {
                             app.stop();
-                            // exit(ReturnCode.SUCCESS_RETURN_CODE);
+                            
+                            exit(ReturnCode.SUCCESS_RETURN_CODE);
                         } catch (Exception e) {
                             LOGGER.warn("An error during the application shutdown", e);
+                            exit(ReturnCode.ERROR_RETURN_CODE);
                         }
                     }
                 });
 
-                LOGGER.debug("Args: " + args);
                 app.start();
             }
         } catch (final CmdLineException e) {
@@ -126,10 +191,10 @@ public class App {
 
     private static void displayHelp(final CmdLineParser parser) {
         parser.printUsage(System.err);
-        System.err.println("Example 1: ./start.sh -serialPort /dev/ttyS80 -refreshInterval 4000");
-        System.err.println(
+        printErrorMessage("Example 1: ./start.sh -serialPort /dev/ttyS80 -refreshInterval 4000");
+        printErrorMessage(
                 "Example 2: ./start.sh -serialPort /dev/ttyS80 -refreshInterval 4000 -installAsService -serviceRunAs root -useSerialPortSymbolicLink -serialPortSymbolicLinkTarget /dev/ttyAMA0");
-        System.err.println(
+        printErrorMessage(
                 "Tips: sometimes the serial port can require a symbolic link (e.g: 'sudo ln -s /dev/ttyAMA0 /dev/ttyS80')");
     }
 
@@ -147,10 +212,50 @@ public class App {
                 break;
         }
 
+        System.out.println("Bye !");
         System.exit(exit);
     }
 
-    private static void installAsService(final Options options, String[] appArgs) throws Exception {
+    
+    @Override
+	public void onWarning(ApplicationContext appContext, String warning) {
+    	printWarningMessage(warning);
+	}
+
+	@Override
+	public void onError(ApplicationContext appContext, String errorMessage, Throwable trace) {
+		LOGGER.error(errorMessage, trace);
+		printErrorMessage(errorMessage + " - Error: \"" + trace.getClass().getName() + ":" + trace.getMessage() + "\"");
+	}
+
+	@Override
+	public void onFatalError(ApplicationContext appContext, String errorMessage, Throwable fatalError) {
+		LOGGER.error(errorMessage, fatalError);
+		printFatalErrorMessage(errorMessage);
+		exit(ReturnCode.ERROR_RETURN_CODE);
+	}
+
+	private static void printInfoMessage(String message) {
+    	//System.out.println("INFO : " + message);
+    	LOGGER.info(message);
+	}
+
+	private static void printWarningMessage(String message) {
+		LOGGER.warn(message);
+    	//System.err.println("WARN : " + message);
+	}
+
+	private static void printErrorMessage(String message) {
+		LOGGER.error(message);
+    	//System.err.println("ERROR: " + message);
+	}
+
+	private static void printFatalErrorMessage(String message) {
+		LOGGER.error(message);
+    	//System.err.println("FATAL: " + message);
+	}
+
+	private static void installAsService(final Options options, String[] appArgs) throws Exception {
         String currentUser = System.getProperty("user.name");
         if (!"root".equals(currentUser)) {
             throw new IllegalStateException("To install service, you must be logged with 'root' user");

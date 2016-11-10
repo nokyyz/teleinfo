@@ -9,20 +9,13 @@
 	<artifactId>teleinfo-reader-io-serial-port</artifactId>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.openhab.binding.teleinfo</groupId>
-			<artifactId>teleinfo-reader-core</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.openhab.binding.teleinfo</groupId>
-			<artifactId>teleinfo-reader-core</artifactId>
+			<artifactId>teleinfo-reader-dsl</artifactId>
 			<version>2.0.0-SNAPSHOT</version>
-			<type>test-jar</type>
-			<scope>test</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.neuronrobotics</groupId>
 			<artifactId>nrjavaserial</artifactId>

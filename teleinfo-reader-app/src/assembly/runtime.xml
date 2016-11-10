@@ -24,6 +24,18 @@
 <!-- 	</fileSets> -->
 	<files>
 		<file>
+			<outputDirectory>/plugins/</outputDirectory>
+			<destName>README.TXT</destName>
+			<source>src/assembly/resources/PLUGINS_FOLDER_README.TXT</source>
+			<fileMode>755</fileMode>
+		</file>
+		<file>
+			<outputDirectory>/conf/plugins/</outputDirectory>
+			<destName>README.TXT</destName>
+			<source>src/assembly/resources/CONF_PLUGINS_FOLDER_README.TXT</source>
+			<fileMode>755</fileMode>
+		</file>
+		<file>
 			<outputDirectory>/</outputDirectory>
 			<source>src/assembly/resources/start.sh</source>
 			<fileMode>755</fileMode>

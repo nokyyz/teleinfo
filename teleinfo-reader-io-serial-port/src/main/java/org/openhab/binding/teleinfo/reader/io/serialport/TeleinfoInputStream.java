@@ -16,12 +16,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.openhab.binding.teleinfo.reader.Frame;
-import org.openhab.binding.teleinfo.reader.Frame.PeriodeTarifaire;
-import org.openhab.binding.teleinfo.reader.FrameOptionBase;
-import org.openhab.binding.teleinfo.reader.FrameOptionHeuresCreuses;
-import org.openhab.binding.teleinfo.reader.FrameOptionHeuresCreuses.GroupeHoraire;
-import org.openhab.binding.teleinfo.reader.FrameOptionTempo;
+import org.openhab.binding.teleinfo.reader.dsl.Frame;
+import org.openhab.binding.teleinfo.reader.dsl.Frame.PeriodeTarifaire;
+import org.openhab.binding.teleinfo.reader.dsl.FrameOptionBase;
+import org.openhab.binding.teleinfo.reader.dsl.FrameOptionHeuresCreuses;
+import org.openhab.binding.teleinfo.reader.dsl.FrameOptionHeuresCreuses.GroupeHoraire;
+import org.openhab.binding.teleinfo.reader.dsl.FrameOptionTempo;
 import org.openhab.binding.teleinfo.reader.io.serialport.converter.Converter;
 import org.openhab.binding.teleinfo.reader.io.serialport.converter.FloatConverter;
 import org.openhab.binding.teleinfo.reader.io.serialport.converter.GroupeHoraireConverter;

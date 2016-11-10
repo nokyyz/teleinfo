@@ -2,8 +2,8 @@ package org.openhab.binding.teleinfo.reader.io.serialport;
 
 import javax.validation.ConstraintValidator;
 
-import org.openhab.binding.teleinfo.reader.Frame.PeriodeTarifaire;
-import org.openhab.binding.teleinfo.reader.FrameOptionHeuresCreuses.GroupeHoraire;
+import org.openhab.binding.teleinfo.reader.dsl.Frame.PeriodeTarifaire;
+import org.openhab.binding.teleinfo.reader.dsl.FrameOptionHeuresCreuses.GroupeHoraire;
 
 public enum Label {
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+
+<plugin id="tcpip" version="${project.version}">
+	<requires>
+		<import plugin-id="org.openhab.binding.teleinfo.reader.plugin.broadcast" plugin-version="0.0.1"/>
+	</requires>
+	
+	<runtime>
+		<library id="classes" type="code" path="classes/" >
+			<export prefix="*" />
+		</library>
+		<library id="lib1" type="code" path="lib/teleinfo-reader-broadcast-tcpip-core-2.0.0-SNAPSHOT.jar" />
+		<library id="lib2" type="code" path="lib/teleinfo-reader-dsl-2.0.0-SNAPSHOT.jar" />
+		<library id="lib3" type="code" path="lib/mina-core-2.0.9.jar" />
+	</runtime>
+	
+	<extension plugin-id="org.openhab.binding.teleinfo.reader.plugin.broadcast" point-id="broadcast" id="tcpip-broadcast-extension">
+		<parameter id="class" value="org.openhab.binding.teleinfo.broadcast.tcpip.service.TcpipBroadcastService" />
+	</extension>
+</plugin>

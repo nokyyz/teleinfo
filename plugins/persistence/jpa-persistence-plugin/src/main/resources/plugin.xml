@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+
+<plugin id="jdbc" version="${project.version}">
+	<requires>
+		<import plugin-id="org.openhab.binding.teleinfo.reader.plugin.persistence" plugin-version="0.0.1"/>
+	</requires>
+	
+	<runtime>
+		<library id="classes" type="code" path="classes/" >
+			<export prefix="*" />
+		</library>
+		<library id="lib" type="resources" path="lib/"  />
+	</runtime>
+	
+	<extension plugin-id="org.openhab.binding.teleinfo.reader.plugin.persistence" point-id="persistence" id="jdbc-persistence-extension">
+		<parameter id="class" value="org.openhab.binding.teleinfo.reader.persistence.jdbc.JdbcPersistenceService" />
+	</extension>
+</plugin>

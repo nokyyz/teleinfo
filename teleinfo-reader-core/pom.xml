@@ -8,28 +8,36 @@
 	</parent>
 	<artifactId>teleinfo-reader-core</artifactId>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
 	<dependencies>
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
+			<groupId>org.openhab.binding.teleinfo</groupId>
+			<artifactId>teleinfo-reader-io-serial-port</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.jpf</groupId>
+			<artifactId>jpf</artifactId>
+			<version>1.5</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openhab.binding.teleinfo</groupId>
+			<artifactId>teleinfo-reader-persistence-plugin</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openhab.binding.teleinfo</groupId>
+			<artifactId>teleinfo-reader-broadcast-plugin</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>20.0</version>
 		</dependency>
 
 		<dependency>
