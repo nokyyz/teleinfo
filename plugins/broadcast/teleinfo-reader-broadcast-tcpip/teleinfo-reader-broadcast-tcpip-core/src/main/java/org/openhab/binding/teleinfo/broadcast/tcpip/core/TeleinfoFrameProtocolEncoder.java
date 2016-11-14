@@ -82,6 +82,7 @@ public class TeleinfoFrameProtocolEncoder implements ProtocolEncoder {
 
     private void encodeCommonsFields(IoBuffer buffer, Frame frame) throws Exception {
         encodeDate(buffer, frame.getTimestamp());
+        encodeVariableString(buffer, frame.getId().toString());
         encodeVariableString(buffer, frame.getADCO());
         buffer.putInt(frame.getIntensiteInstantanee());
         buffer.putInt(frame.getIntensiteSouscrite());

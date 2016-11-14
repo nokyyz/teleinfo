@@ -2,6 +2,7 @@ package org.openhab.binding.teleinfo.broadcast.tcpip.core;
 
 import java.nio.charset.CharsetDecoder;
 import java.util.Date;
+import java.util.UUID;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
@@ -85,6 +86,7 @@ public class TeleinfoFrameProtocolDecoder extends CumulativeProtocolDecoder {
 
     private void decodeCommonsFields(IoBuffer buffer, Frame frame) throws Exception {
         frame.setTimestamp(decodeDate(buffer));
+        frame.setId(UUID.fromString(decodeVariableString(buffer)));
         frame.setADCO(decodeVariableString(buffer));
         frame.setIntensiteInstantanee(buffer.getInt());
         frame.setIntensiteSouscrite(buffer.getInt());
