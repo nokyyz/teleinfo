@@ -65,7 +65,7 @@ public class App extends ApplicationContextListenerAdapter {
 			}
 		});
 
-    	LogManager.getLogManager().reset(); // trick to disable log message from JPF
+    	LogManager.getLogManager().reset(); // trick to disable log messages from JPF
 
         appContext.init();
     }
@@ -135,6 +135,7 @@ public class App extends ApplicationContextListenerAdapter {
 		printInfoMessage("Stopping...");
     	if (appContext != null) {
         	appContext.destroy();
+        	appContext = null;
     	}
     }
 
@@ -169,10 +170,9 @@ public class App extends ApplicationContextListenerAdapter {
                         try {
                             app.stop();
                             
-                            exit(ReturnCode.SUCCESS_RETURN_CODE);
+                            System.out.println("Bye !");
                         } catch (Exception e) {
                             LOGGER.warn("An error during the application shutdown", e);
-                            exit(ReturnCode.ERROR_RETURN_CODE);
                         }
                     }
                 });
@@ -212,7 +212,6 @@ public class App extends ApplicationContextListenerAdapter {
                 break;
         }
 
-        System.out.println("Bye !");
         System.exit(exit);
     }
 

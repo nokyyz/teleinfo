@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.java.plugin.ObjectFactory;
 import org.java.plugin.PluginClassLoader;
@@ -60,6 +62,7 @@ public class DefaultApplicationContext implements ApplicationContext {
 	private Map<String, BroadcastService> broadcastServices;
 	private Map<String, BroadcastService> startedBroadcastServices;
 	private Set<WeakReference<ApplicationContextListener>> appContextListeners;
+	private ExecutorService frameDispatcherExecutorService = Executors.newFixedThreadPool(5);
 
 	public DefaultApplicationContext() {
 		appContextListeners = new HashSet<>();
@@ -79,6 +82,7 @@ public class DefaultApplicationContext implements ApplicationContext {
 
 		fireEvent(ApplicationContextListenerEventName.onPersistencePluginsLoading);
 		persistenceServices = new HashMap<>();
+		startedPersistenceServices = new HashMap<>();
 		loadPersistencePlugins();
 		if (persistenceServices.size() == 0) {
 			fireEvent(onWarning, "No persistence service loaded");
@@ -102,7 +106,6 @@ public class DefaultApplicationContext implements ApplicationContext {
 				return;
 			}
 			
-			startedPersistenceServices = new HashMap<>();
 			for (Entry<String, PersistenceService> persistenceServiceEntry : persistenceServices.entrySet()) {
 				String serviceId = persistenceServiceEntry.getKey();
 				try {
@@ -167,12 +170,17 @@ public class DefaultApplicationContext implements ApplicationContext {
 	
 			serialPortReader.addListener(new TeleinfoReaderListenerAdaptor() {
 				@Override
-				public void onFrameReceived(TeleinfoReader reader, Frame frame) {
+				public void onFrameReceived(TeleinfoReader reader, final Frame frame) {
 					LOGGER.debug("onFrameReceived(TeleinfoReader, Frame) [start]");
 					
-					persist(frame);
-					broadcast(frame);
-	
+					frameDispatcherExecutorService.execute(new Runnable() {
+						@Override
+						public void run() {
+							persist(frame);
+							broadcast(frame);
+						}
+					});
+					
 					LOGGER.debug("onFrameReceived(TeleinfoReader, Frame) [end]");
 				}
 			});
@@ -197,6 +205,8 @@ public class DefaultApplicationContext implements ApplicationContext {
 	public void destroy() throws Exception {
 		LOGGER.debug("destroy() [start]");
 
+		frameDispatcherExecutorService.shutdownNow();
+		
         if (serialPortReader != null) {
             serialPortReader.close();
             serialPortReader = null;
@@ -301,22 +311,22 @@ public class DefaultApplicationContext implements ApplicationContext {
 			frameToPersist.setId(UUID.randomUUID());
 		}
 		
+		// persist into default persistence
 		try {
-			// persist into default persistence
 			if (defaultPersistenceService != null) {
 				defaultPersistenceService.insert(frameToPersist);				
 			}
-
-			// ... and others persistence services
-			for (Entry<String, PersistenceService> startedPersistenceServiceEntry : startedPersistenceServices.entrySet()) {
-				try {
-					startedPersistenceServiceEntry.getValue().insert(frameToPersist);
-				} catch (Throwable t) {
-					fireEvent(ApplicationContextListenerEventName.onError, "An error occurred during frame persist with '" + startedPersistenceServiceEntry.getKey() + "' service", t);
-				}
-			}
 		} catch (Throwable t) {
 			fireEvent(ApplicationContextListenerEventName.onError, "An error occurred during frame persist with default service", t);
+		}
+
+		// ... and others persistence services
+		for (Entry<String, PersistenceService> startedPersistenceServiceEntry : startedPersistenceServices.entrySet()) {
+			try {
+				startedPersistenceServiceEntry.getValue().insert(frameToPersist);
+			} catch (Throwable t) {
+				fireEvent(ApplicationContextListenerEventName.onError, "An error occurred during frame persist with '" + startedPersistenceServiceEntry.getKey() + "' service", t);
+			}
 		}
 		
 		LOGGER.debug("persist(Frame) [end]");
@@ -488,18 +498,19 @@ public class DefaultApplicationContext implements ApplicationContext {
     
     private void fireFatalError(final String errorMessage, final Throwable fatalError) {
     	LOGGER.trace("fireFatalError(Throwable) [start]");
+
+    	try {
+			destroy();
+		} catch (Exception e) {
+			fireEvent(ApplicationContextListenerEventName.onWarning, "An error occurred during app context destroy");
+		}
+
     	for (WeakReference<ApplicationContextListener> weakReferenceAppContextListener : appContextListeners) {
     		ApplicationContextListener appContextListener = weakReferenceAppContextListener.get();
     		if (appContextListener != null) {
     			appContextListener.onFatalError(this, errorMessage, fatalError);
     		}
     	}
-    	
-    	try {
-			destroy();
-		} catch (Exception e) {
-			fireEvent(ApplicationContextListenerEventName.onWarning, "An error occurred during app context destroy");
-		}
     	
     	LOGGER.trace("fireFatalError(Throwable) [end]");
     }
