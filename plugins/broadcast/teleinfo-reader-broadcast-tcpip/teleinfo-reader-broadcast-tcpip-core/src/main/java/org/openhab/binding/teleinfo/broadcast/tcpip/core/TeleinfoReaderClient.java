@@ -10,8 +10,8 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.openhab.binding.teleinfo.reader.TeleinfoReaderAdaptor;
 import org.openhab.binding.teleinfo.reader.dsl.Frame;
+import org.openhab.binding.teleinfo.reader.io.TeleinfoReaderAdaptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

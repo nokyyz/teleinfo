@@ -55,8 +55,8 @@ public class App extends ApplicationContextListenerAdapter {
 
         appContext.setSerialPortName(options.getSerialPort());
         appContext.setRefreshInterval(options.getRefreshInterval());
-        appContext.setPluginsFolder(new File("./plugins"));
-        appContext.setPluginsConfigurationHandler(new PropertiesConfigurationPluginHandler(new File("./conf/plugins/")) {
+        appContext.setPluginsFolder(Paths.get("./plugins"));
+        appContext.setPluginsConfigurationHandler(new PropertiesConfigurationPluginHandler(Paths.get(".", "/conf", "/plugins")) {
 			@Override
 			public void onInvalidConfiguration(InvalidConfigurationException error, String pluginId) {
 				final String errorMessage = "The configuration of '" + pluginId + "' plugin is invalid";

@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.openhab.binding.teleinfo.reader.context.conf.ConfigurationPluginHandler;
@@ -25,9 +28,9 @@ public abstract class PropertiesConfigurationPluginHandler implements Configurat
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesConfigurationPluginHandler.class);
 
-	private File configurationFolder;
+	private Path configurationFolder;
 	
-	public PropertiesConfigurationPluginHandler(final File configurationFolder) {
+	public PropertiesConfigurationPluginHandler(final Path configurationFolder) {
 		this.configurationFolder = configurationFolder;
 	}
 	
@@ -35,12 +38,12 @@ public abstract class PropertiesConfigurationPluginHandler implements Configurat
 	public Configuration getConfiguration(String pluginId, ConfigurationDefinition configurationDefinition) throws InvalidConfigurationException, MissingConfigurationException, IOException {
 		LOGGER.debug("getConfiguration(String, ConfigurationDefinition) [start]");
 		
-		File confPropertiesFile = new File(configurationFolder, pluginId + ".cfg");
-		if (! confPropertiesFile.exists()) {
-			LOGGER.warn("No configuration file exists ("+confPropertiesFile.getName()+") for '" + pluginId + "' plugin in '" + configurationFolder.getAbsolutePath() + "' folder");
+		Path confPropertiesFile = Paths.get(configurationFolder.getFileName().resolve(pluginId + ".cfg").toUri());
+		if (! Files.exists(confPropertiesFile)) {
+			LOGGER.warn("No configuration file exists ("+confPropertiesFile.getFileName() +") for '" + pluginId + "' plugin in '" + configurationFolder.toAbsolutePath() + "' folder");
 			// initialize automatically the parameters before throw a error
-			if (confPropertiesFile.getParentFile() != null && !confPropertiesFile.getParentFile().exists()) {
-				confPropertiesFile.getParentFile().mkdirs();
+			if (confPropertiesFile.getParent() != null && ! Files.exists(confPropertiesFile.getParent())) {
+				Files.createDirectory(confPropertiesFile.getParent());
 			}
 			try {
 				initializeEmptyConfigurationFile(confPropertiesFile, configurationDefinition, pluginId);
@@ -52,7 +55,7 @@ public abstract class PropertiesConfigurationPluginHandler implements Configurat
 		}
 		
 		Properties parametersProperties = new Properties();
-		try (InputStream in = new FileInputStream(confPropertiesFile)) {
+		try (InputStream in = new FileInputStream(confPropertiesFile.toFile())) {
 			parametersProperties.load(in);
 		} catch (Exception e) {
 			throw new IOException("An error occurred during '" + pluginId + "' service's configuration loading");
@@ -83,10 +86,10 @@ public abstract class PropertiesConfigurationPluginHandler implements Configurat
 		return configuration;
 	}
 	
-	private void initializeEmptyConfigurationFile(final File confFile, final ConfigurationDefinition configurationDefinition, String pluginId) throws IOException {
-		LOGGER.debug("initializeEmptyConfigurationFile(File) [start]");
+	private void initializeEmptyConfigurationFile(final Path confFile, final ConfigurationDefinition configurationDefinition, String pluginId) throws IOException {
+		LOGGER.debug("initializeEmptyConfigurationFile(Path) [start]");
 		
-		try (PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(confFile), "ISO-8859-1")))) {
+		try (PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(confFile.toFile()), "ISO-8859-1")))) {
 			out.println("Teleinfo-Reader - '" + pluginId + "' plugin configuration");
 			out.println("---------------------------------------------------------------------");
 			if (configurationDefinition.getDocumentationURL() != null) {
@@ -104,6 +107,6 @@ public abstract class PropertiesConfigurationPluginHandler implements Configurat
 			throw new IOException("An error occurred during '" + pluginId + "' plugin's configuration initialization");
 		}
 
-		LOGGER.debug("initializeEmptyConfigurationFile(File) [end]");
+		LOGGER.debug("initializeEmptyConfigurationFile(Path) [end]");
 	}
 }

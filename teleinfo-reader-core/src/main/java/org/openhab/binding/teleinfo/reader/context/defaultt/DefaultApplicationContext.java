@@ -6,7 +6,9 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -28,14 +30,14 @@ import org.java.plugin.registry.Extension;
 import org.java.plugin.registry.ExtensionPoint;
 import org.java.plugin.standard.StandardPluginLocation;
 import org.java.plugin.util.ExtendedProperties;
-import org.openhab.binding.teleinfo.reader.TeleinfoReader;
-import org.openhab.binding.teleinfo.reader.TeleinfoReaderListenerAdaptor;
 import org.openhab.binding.teleinfo.reader.context.ApplicationContext;
 import org.openhab.binding.teleinfo.reader.context.ApplicationContextListener;
 import org.openhab.binding.teleinfo.reader.context.conf.ConfigurationPluginHandler;
 import org.openhab.binding.teleinfo.reader.dsl.Frame;
-import org.openhab.binding.teleinfo.reader.io.TeleinfoSerialportReader;
-import org.openhab.binding.teleinfo.reader.io.serialport.TeleinfoInputStream;
+import org.openhab.binding.teleinfo.reader.io.TeleinfoReader;
+import org.openhab.binding.teleinfo.reader.io.TeleinfoReaderListenerAdaptor;
+import org.openhab.binding.teleinfo.reader.io.serialport.TeleinfoSerialportReader;
+import org.openhab.binding.teleinfo.reader.io.stream.TeleinfoInputStream;
 import org.openhab.binding.teleinfo.reader.plugin.broadcast.BroadcastService;
 import org.openhab.binding.teleinfo.reader.plugin.core.conf.ConfigurableService;
 import org.openhab.binding.teleinfo.reader.plugin.core.conf.Configuration;
@@ -51,7 +53,7 @@ public class DefaultApplicationContext implements ApplicationContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultApplicationContext.class);
 
-	private File pluginsFolder;
+	private Path pluginsFolder;
 	private String serialPortName;
 	private long refreshInterval;
 	private ConfigurationPluginHandler configurationPluginHandler;
@@ -76,9 +78,9 @@ public class DefaultApplicationContext implements ApplicationContext {
 		Preconditions.checkNotNull(serialPortName, "Serial port name must be defined in Application context");
 		Preconditions.checkNotNull(refreshInterval, "Refresh interval must be defined in Application context");
 		Preconditions.checkNotNull(pluginsFolder, "Plugins folder must be defined in Application context");
-		Preconditions.checkArgument(pluginsFolder.exists(), "Plugins folder must exist");
-		Preconditions.checkArgument(pluginsFolder.canRead(), "Plugins folder must be readable (please check access rights)");
-		Preconditions.checkArgument(pluginsFolder.isFile() == false, "Plugins folder must be a folder (not a file)");
+		Preconditions.checkArgument(Files.exists(pluginsFolder), "Plugins folder must exist");
+		Preconditions.checkArgument(Files.isReadable(pluginsFolder), "Plugins folder must be readable (please check access rights)");
+		Preconditions.checkArgument(Files.isDirectory(pluginsFolder), "Plugins folder must be a folder (not a file)");
 
 		fireEvent(ApplicationContextListenerEventName.onPersistencePluginsLoading);
 		persistenceServices = new HashMap<>();
@@ -253,7 +255,7 @@ public class DefaultApplicationContext implements ApplicationContext {
 	}
 	
 	@Override
-	public void setPluginsFolder(File value) {
+	public void setPluginsFolder(Path value) {
 		this.pluginsFolder = value;
 	}
 	
@@ -349,13 +351,13 @@ public class DefaultApplicationContext implements ApplicationContext {
 
 		// Load addons from the "plugins" folder
 		List<URL> pluginPaths = new ArrayList<>();
-		pluginPaths.add(pluginsFolder.toURI().toURL());
+		pluginPaths.add(pluginsFolder.toFile().toURI().toURL());
 
-		if (! pluginsFolder.exists() || ! pluginsFolder.canRead()) {
-			throw new InvalidPathException(pluginsFolder.getAbsolutePath(), "Plugins folder doesn't exist or can't be read");
+		if (! Files.exists(pluginsFolder) || ! Files.isReadable(pluginsFolder)) {
+			throw new InvalidPathException(pluginsFolder.toAbsolutePath().toString(), "Plugins folder doesn't exist or can't be read");
 		}
 		
-		File[] pluginFiles = pluginsFolder.listFiles();
+		File[] pluginFiles = pluginsFolder.toFile().listFiles();
 		LOGGER.debug("pluginFiles.length = " + pluginFiles.length);
 
 		for (File pluginFile : pluginFiles) {

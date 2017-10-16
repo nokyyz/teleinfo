@@ -1,6 +1,6 @@
 package org.openhab.binding.teleinfo.reader.context;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.openhab.binding.teleinfo.reader.context.conf.ConfigurationPluginHandler;
 
@@ -14,7 +14,7 @@ public interface ApplicationContext {
 	
 	void setRefreshInterval(long value);
 
-	void setPluginsFolder(File value);
+	void setPluginsFolder(Path value);
 
 	void setPluginsConfigurationHandler(final ConfigurationPluginHandler handler);
 	
